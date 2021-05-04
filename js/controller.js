@@ -16,6 +16,9 @@ app.controller("CharsetController", function ($scope, $timeout, $http) {
     $scope.receiveChar = null;
     $scope.receiveCharInfo = null; //decode
 
+    $scope.messages = new Array("Waiting for input...");
+
+
     // $http.get('js/charsets.json').success(function (data) {
     //     $scope.charsets = data;
     // });
@@ -296,6 +299,12 @@ app.controller("CharsetController", function ($scope, $timeout, $http) {
 
     $scope.receivedMessage = "";
 
+    $scope.clearLogs = function () {
+        // reinitialize the message array
+        $scope.messages = new Array("The log was cleared, send another message");
+        $scope.message = null;
+    }
+
     $scope.send = function () {
         console.log("Clicked the send button - message: " + $scope.message);
 
@@ -316,16 +325,21 @@ app.controller("CharsetController", function ($scope, $timeout, $http) {
     function sendCharacter(position) {
 
         console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        $scope.messages.push("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
         $scope.currentChar = $scope.message.charAt(position);
 
         //encode it and discover the binary work... to come later... 
         console.log("Sending character: " + $scope.currentChar + ", pos: " + position);
+        $scope.messages.push("Sending character: " + $scope.currentChar + ", pos: " + position)
 
         $scope.sendCharInfo = getCharInfo($scope.senderCharset, "encode", $scope.currentChar);
 
         console.log("Encoding char '" + $scope.currentChar + "' in charset '" + $scope.senderCharset + "'");
         console.log($scope.sendCharInfo);
+
+        $scope.messages.push("Encoding char '" + $scope.currentChar + "' in charset '" + $scope.senderCharset + "'");
+        $scope.messages.push("binary : " + $scope.sendCharInfo.bin + " hexadecimal : " + $scope.sendCharInfo.hex + " decimal : " + $scope.sendCharInfo.dec);
 
         //sending happens - light the wires ON and OFF based on the binarry info... 
 
@@ -346,6 +360,9 @@ app.controller("CharsetController", function ($scope, $timeout, $http) {
         console.log("Decoded char '" + $scope.receiveChar + "' in charset '" + $scope.receiverCharset + "'");
         console.log($scope.receiveCharInfo);
 
+        $scope.messages.push("Decoded char '" + $scope.receiveChar + "' in charset '" + $scope.receiverCharset + "'");
+        $scope.messages.push("char : " + $scope.receiveCharInfo.char + " hexadecimal : " + $scope.receiveCharInfo.hex + " binary : " + $scope.receiveCharInfo.bin);
+
         //increment current position - next time we pick next character
         $scope.currentPos = $scope.currentPos + 1;
 
@@ -360,6 +377,8 @@ app.controller("CharsetController", function ($scope, $timeout, $http) {
             }, $scope.clockCycle);
         } else {
             console.log("We have finished sending the last character");
+
+            $scope.messages.push("The last character was sent");
         }
     }
 
